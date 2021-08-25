@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- leaflet css link  -->
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+    />
+
+    <title>Web-GIS with geoserver and leaflet</title>
+
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+      }
+      #map {
+        width: 100%;
+        height: 100vh;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+  </body>
+</html>
+
+<!-- leaflet js link  -->
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+
+<!-- jquery link  -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+<!-- leaflet geoserver request link  -->
+<script src="lib/L.Geoserver.js"></script>
+
+<script>
+// pluguin usat
+// https://www.npmjs.com/package/leaflet-geoserver-request
+var map = L.map("map").setView([41.49, 1.09], 12);
+
+  var osm = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    maxZoom: 19,
+    attribution:
+      '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+  });
+
+  osm.addTo(map);
+
+// wms request
+/*var wmsLayer = L.Geoserver.wms("http://localhost:8080/geoserver/wms", {
+    layers: "demo:topo_icgc",
+   // transparent: true,
+  //  CQL_FILTER: "TYPE=='RC_2'", // permet filtrarr per atributs
+    attribution: "My wms map of building",
+  });
+  wmsLayer.addTo(map); */
+  // wms request
+  var wmsLayer = L.Geoserver.wms("http://localhost:8080/geoserver/wms", {
+    layers: "demo:espluga",
+   // transparent: true,
+  //  CQL_FILTER: "TYPE=='RC_2'", // permet filtrarr per atributs
+    attribution: "My wms map of building",
+  });
+  wmsLayer.addTo(map);
+// wfs 
+  var wfsLayer = L.Geoserver.wfs("http://localhost:8080/geoserver/wfs", {
+    layers: "demo:POLYLINE",
+    style: {
+      color: "red",
+      with: 0.7,
+    },
+    onEachFeature: function (feature, layer) {
+      console.log(feature);
+      layer.bindPopup(
+        "Cami: " + feature.properties.name
+      );
+    },
+    // CQL_FILTER: "district='Syangja'",
+  });
+  wfsLayer.addTo(map);
+/*
+  var layerLegend = L.Geoserver.legend("http://localhost:8080/geoserver/wms", {
+    layers: "demo:espluga",
+    // style: `stylefile`,
+  });
+
+  layerLegend.addTo(map);
+  */
+</script>
